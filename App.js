@@ -1,27 +1,31 @@
-import React, { useState } from 'react';
-import Home from './screens/home';
-import * as Font from 'expo-font';
-import { AppLoading } from 'expo';
-
-const getFonts = () => Font.loadAsync({
-  'BeVietnamPro-Black': require('./assets/fonts/BeVietnamPro-Black.ttf'),
-  'BeVietnamPro-BlackItalic': require('./assets/fonts/BeVietnamPro-BlackItalic.ttf'),
-});
+import { useCallback } from 'react';
+import { Text, View, StyleSheet } from 'react-native';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+import Navigator from './routes/homeStack';
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [fontsLoaded] = useFonts({
+    'Inter-Black': require('./assets/fonts/BeVietnamPro-Black.ttf'),
+  });
 
-  if (fontsLoaded) {
-    return (
-      <Home />
-    );
-  } else {
-    return (
-      <AppLoading 
-        startAsync={getFonts} 
-        onFinish={() => setFontsLoaded(true)} 
-      />
-    )
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
   }
 
+  return (
+    <View onLayout={onLayoutRootView}>
+      <Navigator />
+    </View>
+  );
 }
+
+
